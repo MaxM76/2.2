@@ -74,14 +74,7 @@ switch ($action) {
         }
         array_walk_recursive ($goals , 'to_integer');
 
-        echo 'integer $goals';
-        echo '<br>';
-        print_r($goals);
-        echo '<br>';
         $sumGoals = array_sum(makeRecursive($goals));
-        echo '$sumGoals';
-        print_r($sumGoals);
-        echo '<br>';
         echo 'Ваш результат: ' . $sumGoals / $maxGoals * 100 . '%<br>';
         exit('Тест пройден');
     default:
