@@ -1,10 +1,8 @@
 <?php
-if (isset($_POST) and isset($_FILES)) {
-    //(isset($_POST) && isset($_FILES) && isset($_FILES['filename']))
-    echo 'yes';
-    $filename = $_FILES['filename']['name'];
-    $tmpFile = $_FILES['filename']['tmp_name'];
-    $testDir = '';//'tests/';
+if (isset($_POST) && isset($_FILES) && isset($_FILES['userfile'])) {
+    $filename = $_FILES['userfile']['name'];
+    $tmpFile = $_FILES['userfile']['tmp_name'];
+    $testDir = '';//'tests';
     $pathParts = pathinfo($filename);
     if ($pathParts['extension'] === 'json') {
         move_uploaded_file($tmpFile, $testDir . $filename);
@@ -29,11 +27,11 @@ if (isset($_POST) and isset($_FILES)) {
   <body>
     <h1>Администрирование</h1>
 
-    <form action="admin.php" method="post" enctype=multipart/form-data>
-      <label>Загрузите *.json файл с тестом</label>
-      <input type="hidden" name="MAX_FILE_SIZE" value="300000" />
-      <input type="file" name="filename" value="">
-      <input type="submit" value="Добавить тест">
+    <form method="POST" action="admin.php" enctype="multipart/form-data">
+        <label>Загрузите *.json файл с тестом</label><br>
+        <input type="hidden" name="MAX_FILE_SIZE" value="300000">
+        <input type="file" name="userfile">
+        <input type="submit" value="Добавить тест">
     </form>
 
     <a href="list.php">Перейти к списку тестов</a>
