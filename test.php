@@ -35,8 +35,6 @@ switch ($action) {
             $testNmb = $_GET['test_nm'];
         }
 
-        $testNmb = 1;
-
         $jsonfileList = glob("*.json");
         if (($jsonfileList === false) or (count($jsonfileList) == 0)) {
             echo '<a href="admin.php">Перейти к форме загрузки тестов</a><br>';
