@@ -1,27 +1,5 @@
 <?php
 
-function to_integer(&$item1)
-{
-    $item1 = (integer) $item1;
-}
-
-function makeRecursive($array = "")
-{
-    $toflat = array($array);
-    $result = array();
-    while (($r = array_shift($toflat)) !== NULL)
-        foreach ($r as $v)
-            if (is_array($v)) {
-                $toflat[] = $v;
-            }
-            else {
-                $result[] = $v;
-            }
-    return $result;
-}
-
-
-
 if (!empty($_GET['action'])) {
     $action = $_GET['action'];
 }
@@ -33,6 +11,8 @@ switch ($action) {
     case 'test':
         if (!empty($_GET['test_nm'])) {
             $testNmb = $_GET['test_nm'];
+        } else {
+            $testNmb = 0;
         }
 
         $jsonfileList = glob("*.json");
@@ -63,23 +43,38 @@ switch ($action) {
     case 'calc':
         if (!empty($_GET['q'])) {
             $goals = $_GET['q'];
+        } else {
+            exit('Ошибка получения ответов на тест');
         }
+
         if (!empty($_GET['max'])) {
             $maxGoals = $_GET['max'];
+        } else {
+            $maxGoals = 0;
         }
+
         if ($maxGoals == 0) {
             exit('Ошибка подсчета максимально возможного результата');
         }
-        array_walk_recursive ($goals , 'to_integer');
 
-        $sumGoals = array_sum(makeRecursive($goals));
+        $sumGoals = 0;
+        $tmpSum = 0;
+
+        foreach ($goals as $answers) {
+            foreach ($answers as $shot) {
+                $tmpSum = $tmpSum + $shot;
+            }
+            if ($tmpSum > 0) {
+                $sumGoals = $sumGoals + $tmpSum;
+            }
+            $tmpSum = 0;
+        }
         echo 'Ваш результат: ' . $sumGoals / $maxGoals * 100 . '%<br>';
         exit('Тест пройден');
     default:
         echo '<a href="admin.php">Перейти к форме загрузки тестов</a><br>';
         exit('Ошибка передачи параметра действия');
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -115,22 +110,24 @@ switch ($action) {
 */
           $inputType = 'checkbox'
       ?>
-        <fieldset>
-          <legend>Вопрос № <?= $i ?>: <?=$curQuestion["question"] ?></legend>
-          <ol>
+      <fieldset>
+        <legend>Вопрос № <?= $i ?>: <?=$curQuestion["question"] ?></legend>
+        <ol>
           <?php
           $q = 1;
           foreach ($curQuestion["answers"] as $key => $curAnswer) {
           ?>
-              <li><input type="<?= $inputType ?>" name="<?= 'q[' . $j .']['. $key . ']'?>" value="<?= $curQuestion["results"][$q] ?>"><?= $curAnswer ?></li>
+          <li><input type="<?= $inputType ?>" name="<?= 'q[' . $j .']['. $key . ']'?>" value="<?= $curQuestion["results"][$q] ?>"><?= $curAnswer ?></li>
           <?php
-              $maxSum = $maxSum + $curQuestion["results"][$q];
+              if ($curQuestion["results"][$q] > 0) {
+                  $maxSum = $maxSum + $curQuestion["results"][$q];
+              }
               $q++;
           }
           ?>
-
-          </ol>
-        </fieldset>
+          <input type="hidden" name="<?= 'answ_count[' . $j .']'?>" value="<?= count($curQuestion["results"]) ?>">
+        </ol>
+      </fieldset>
           <?php
         }
         ?>
